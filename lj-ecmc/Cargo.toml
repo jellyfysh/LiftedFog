@@ -1,0 +1,43 @@
+[package]
+name = "lj_ecmc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+argmin = "0.11"
+float-cmp = "0.10"
+itertools = "0.14"
+log = { version = "0.4", features = ["release_max_level_warn"] }
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+rand = "0.10"
+rand_distr = "0.6"
+readonly = "0.2"
+serde = "1"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+
+[dev-dependencies]
+env_logger = "0.11"
+
+[lints.rust]
+rust_2018_compatibility = "deny"
+rust_2018_idioms = "deny"
+rust_2021_compatibility = "deny"
+rust_2024_compatibility = "deny"
+
+[lints.clippy]
+absolute_paths = "warn"
+missing_const_for_fn = "warn"
+missing_inline_in_public_items = "warn"
+pedantic = "warn"
+std_instead_of_core = "warn"
+
+[profile.bench]
+codegen-units = 1
+debug = true
+lto = "fat"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
