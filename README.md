@@ -4,7 +4,7 @@ This repository accompanies the article
 https://doi.org/10.48550/arXiv.2603.16855
 ),
 by Gabriele Tartero, Sora Shiratani, and Werner Krauth.
-It notably contains the source code of ```lj-ecmc```, a Rust sowftare package 
+It notably contains the source code of ```lj-ecmc```, a Rust software package 
 used to run the high-precision event-chain Monte Carlo simulations
 discussed in the manuscript.
 
@@ -29,7 +29,7 @@ for details.
 ### Python programs
 Several observations and preliminary results concerning the ECMC dynamics
 were obtained using [JeLLyFysh](https://github.com/jellyfysh/JeLLyFysh.git) (V1.1),
-an open-source Python application for all-atom event-chain Monte Carlo simulations.
+an open-source Python application for all-atom ECMC simulations.
 
 The factorized Metropolis simulations were performed with an accelerated version of the 
 reversible cell-veto algorithm available in 
