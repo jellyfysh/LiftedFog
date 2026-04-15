@@ -28,7 +28,7 @@ for details.
 
 ### Python programs
 Several observations and preliminary results concerning the ECMC dynamics
-were obtained using [JeLLyFysh (V1.1)](https://github.com/jellyfysh/JeLLyFysh.git),
+were obtained using [JeLLyFysh](https://github.com/jellyfysh/JeLLyFysh.git) (V1.1),
 an open-source Python application for all-atom event-chain Monte Carlo simulations.
 
 The factorized Metropolis simulations were performed with an accelerated version of the 
