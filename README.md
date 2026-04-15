@@ -3,8 +3,8 @@ This repository accompanies the article
 [Lifting the fog - a case for non-reversible "lifted" Markov chains](    
 https://doi.org/10.48550/arXiv.2603.16855
 ),
-by Gabriele Tartero, Sora Shiratani and Werner Krauth.
-It notably contains the source code of ```lj-ecmc```, the Rust sowftare package 
+by Gabriele Tartero, Sora Shiratani, and Werner Krauth.
+It notably contains the source code of ```lj-ecmc```, a Rust sowftare package 
 used to run the high-precision event-chain Monte Carlo simulations
 discussed in the manuscript.
 
@@ -13,12 +13,12 @@ The ```lj-ecmc``` software package, entirely developed by Sora Shiratani,
 is a Rust implementation of the event-chain Monte Carlo (ECMC) algorithm
 for the two-dimensional Lennard-Jones potential (without cutoff).
 The presence of a suitable cell system makes the algorithm's complexity independent of 
-the system size, even with a truly long-range potential
+the system size, even in the presence of a truly long-range interaction
 (for details on this method, called cell-veto, see the paper in 
 [MCLongRange](https://github.com/jellyfysh/MCLongRange.git)).
-With a proper choice of the cell-veto parameters, ```lj-ecmc``` reaches more than $10^9$ 
-event-chain events per hour, thus being at least one hundred times faster than any other 
-existing ECMC implementation for long-range interacting systems
+With a proper choice of the cell-veto parameters, ```lj-ecmc``` is able to compute 
+more than $10^9$ events per hour, thus being at least one hundred times faster than any other 
+existing ECMC implementation for long-range interacting systems.
 
 This software package
 is organized as a standard cargo-based Rust project.
@@ -27,12 +27,12 @@ https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-c
 for details.
 
 ### Python programs
-Several observations and preliminary results concerning the event-chain dynamics
+Several observations and preliminary results concerning the ECMC dynamics
 were obtained using [JeLLyFysh (V1.1)](https://github.com/jellyfysh/JeLLyFysh.git),
 an open-source Python application for all-atom event-chain Monte Carlo simulations.
 
 The factorized Metropolis simulations were performed with an accelerated version of the 
-reversible cell-veto algorithm implemented in 
+reversible cell-veto algorithm available in 
 [MCLongRange](https://github.com/jellyfysh/MCLongRange.git).
 
 ### Authors
