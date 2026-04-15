@@ -1,6 +1,6 @@
 ## LiftedFog
 This repository accompanies the article 
-[Lifting the fog - a case for non-reversible "lifted Markov chains"](    
+[Lifting the fog - a case for non-reversible "lifted" Markov chains](    
 https://doi.org/10.48550/arXiv.2603.16855
 ),
 by Gabriele Tartero, Sora Shiratani and Werner Krauth.
