@@ -331,7 +331,7 @@ impl Event {
 mod tests {
     use std::collections::HashMap;
 
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
     use nalgebra as na;
 
     use super::*;
@@ -377,7 +377,7 @@ mod tests {
         let ss = SamplingState::new(MoveDirection::X, 0, 10.0)?;
         let ev = Event::without_peer((&rs, &ss), EventKind::Timeout, 0.1)?;
         let patch = ev.patch();
-        assert_approx_eq!(f64, patch.x, ev.after);
+        assert_ulps_eq!(patch.x, ev.after);
         Ok(())
     }
 
@@ -389,7 +389,7 @@ mod tests {
         let ev = Event::without_peer((&rs, &ss), EventKind::Boundary, 1E-10)?;
         let patch = ev.patch();
         // PBC applied
-        assert_approx_eq!(f64, patch.y, 0.0);
+        assert_ulps_eq!(patch.y, 0.0);
         Ok(())
     }
 }

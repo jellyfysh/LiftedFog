@@ -106,7 +106,7 @@ impl Deref for State {
 
 #[cfg(test)]
 mod tests {
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
     use nalgebra as na;
 
     use super::*;
@@ -146,10 +146,10 @@ mod tests {
         let mut rng = rand::rng();
         let ss = SamplingState::new(MoveDirection::X, 0, 100.0)?;
         let ev = state.emit(&mut rng, (&state.data, &ss), None);
-        assert_approx_eq!(f64, ev.after, 3.7);
+        assert_ulps_eq!(ev.after, 3.7);
         let ss = SamplingState::new(MoveDirection::Y, 0, 100.0)?;
         let ev = state.emit(&mut rng, (&state.data, &ss), None);
-        assert_approx_eq!(f64, ev.after, 3.3);
+        assert_ulps_eq!(ev.after, 3.3);
         Ok(())
     }
 }

@@ -296,20 +296,17 @@ impl CellVetoSampler {
 
     /// Samples the cell-veto candidate event.
     #[inline]
-    pub fn thinned(&self, rng: &mut impl Rng, base: I2, hint: f64) -> Option<ThinnedSample> {
+    pub fn thinned(&self, rng: &mut impl Rng, base: I2) -> ThinnedSample {
         let time = self.smp_t.sample(rng);
         log::debug!("pre: {time}");
-        if time > hint {
-            return None;
-        }
         let diff = self.smp_g.sample(rng);
         debug_assert!(!self.nb.contains(&diff));
         log::debug!("weight distributed to +{diff:?}");
-        Some(ThinnedSample {
+        ThinnedSample {
             time,
             gid: self.shift(base, diff),
             weight: self.smp_g.weights[diff],
-        })
+        }
     }
 
     /// Iterates over cells that are not thinned.
@@ -321,7 +318,7 @@ impl CellVetoSampler {
 
 #[cfg(test)]
 mod tests {
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
     use nalgebra::{self as na, Matrix2};
     use rand::{RngExt, SeedableRng, rngs::StdRng};
 
@@ -342,10 +339,10 @@ mod tests {
             let (i, j) = smp.sample(&mut rng);
             pcmp[(i, j)] += 1.0 / f64::from(N);
         }
-        assert_approx_eq!(f64, pcmp[(0, 0)], pref[(0, 0)], epsilon = 0.002);
-        assert_approx_eq!(f64, pcmp[(0, 1)], pref[(0, 1)], epsilon = 0.002);
-        assert_approx_eq!(f64, pcmp[(1, 0)], pref[(1, 0)], epsilon = 0.002);
-        assert_approx_eq!(f64, pcmp[(1, 1)], pref[(1, 1)], epsilon = 0.002);
+        assert_ulps_eq!(pcmp[(0, 0)], pref[(0, 0)], epsilon = 0.002);
+        assert_ulps_eq!(pcmp[(0, 1)], pref[(0, 1)], epsilon = 0.002);
+        assert_ulps_eq!(pcmp[(1, 0)], pref[(1, 0)], epsilon = 0.002);
+        assert_ulps_eq!(pcmp[(1, 1)], pref[(1, 1)], epsilon = 0.002);
     }
 
     #[test]
@@ -360,8 +357,8 @@ mod tests {
         let (tab, _) = lj.tab(gs);
         for _ in 0..100_000 {
             let r0 = na::vector![
-                rng.random_range(0.0..gs.unit.dx),
-                rng.random_range(0.0..gs.unit.dy)
+                rng.random_range(0.0..MARGIN_B * gs.unit.dx),
+                rng.random_range(0.0..MARGIN_B * gs.unit.dy)
             ];
             let r1 = na::vector![rng.random_range(0.0..lx), rng.random_range(0.0..ly)];
             let d = gs.mirror(&r0, &r1) - r0;
@@ -382,8 +379,8 @@ mod tests {
         let (_, tab) = lj.tab(gs);
         for _ in 0..100_000 {
             let r0 = na::vector![
-                rng.random_range(0.0..gs.unit.dx),
-                rng.random_range(0.0..gs.unit.dy)
+                rng.random_range(0.0..MARGIN_B * gs.unit.dx),
+                rng.random_range(0.0..MARGIN_B * gs.unit.dy)
             ];
             let r1 = na::vector![rng.random_range(0.0..lx), rng.random_range(0.0..ly)];
             let d = gs.mirror(&r0, &r1) - r0;
@@ -414,8 +411,8 @@ mod tests {
         assert_eq!(cv.smp_g.weights, na::matrix![0.0, 0.0, 1.0, 0.0, 0.0]);
 
         let mut rng = StdRng::seed_from_u64(42);
-        let ev_t = cv.thinned(&mut rng, (0, 3), f64::INFINITY).unwrap();
-        assert_approx_eq!(f64, ev_t.weight, 1.0);
+        let ev_t = cv.thinned(&mut rng, (0, 3));
+        assert_ulps_eq!(ev_t.weight, 1.0);
         assert_eq!(ev_t.gid, (0, 0));
         assert_eq!(
             cv.direct((0, 3)).collect::<Vec<_>>(),

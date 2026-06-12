@@ -97,7 +97,7 @@ impl MoveP for Vector2<f64> {
 
 #[cfg(test)]
 mod tests {
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
     use nalgebra as na;
 
     use super::*;
@@ -106,10 +106,10 @@ mod tests {
     fn test_move_by() {
         let r = na::vector![0.0, 0.0];
         let moved = r.move_by(MoveDirection::X, 1.0);
-        assert_approx_eq!(f64, moved.x, 1.0);
-        assert_approx_eq!(f64, moved.y, 0.0);
+        assert_ulps_eq!(moved.x, 1.0);
+        assert_ulps_eq!(moved.y, 0.0);
         let moved = r.move_by(MoveDirection::Y, 1.0);
-        assert_approx_eq!(f64, moved.x, 0.0);
-        assert_approx_eq!(f64, moved.y, 1.0);
+        assert_ulps_eq!(moved.x, 0.0);
+        assert_ulps_eq!(moved.y, 1.0);
     }
 }

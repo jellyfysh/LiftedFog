@@ -10,7 +10,6 @@ use crate::{
     cv_sampler::{CellVetoSampler, CellVetoTable, MARGIN_B},
     de_sampler::EDiffSampler,
     geom::{Chord, Grid, OnChord},
-    lj::LJ,
     traits::{AddP, ApplyEvent, EmitEvent, InvPotential, MoveP, PotentialDiff},
     types::{
         BRANCH_X, BRANCH_Y, BranchTag, Event, EventKind, I1, I2, MoveDirection, Pos,
@@ -131,8 +130,8 @@ impl<U: InvPotential + PotentialDiff + Clone> Sampler<U> {
         // TODO: Add manual neighbor selection
         anyhow::ensure!(th > 0.0, "threshold must be positive");
         let (tab_x, tab_y) = u.tab(gs);
-        let tab_x = LJ::cutoff(&tab_x, th);
-        let tab_y = LJ::cutoff(&tab_y, th);
+        let tab_x = U::cutoff(&tab_x, th);
+        let tab_y = U::cutoff(&tab_y, th);
         Ok(Self {
             u,
             cv_x: CellVetoSampler::new(&tab_x)?,
@@ -224,10 +223,12 @@ impl<U: InvPotential + PotentialDiff + Clone> Sampler<U> {
     fn cv_ub<const K: BranchTag>(&self, r: &Pos) -> f64 {
         let gs = &self.inner.gs;
         let rb = gs.base(gs.gindex(r));
-        match K {
+        let ret = match K {
             BRANCH_X => rb.x + MARGIN_B * gs.unit.dx - r.x,
             BRANCH_Y => rb.y + MARGIN_B * gs.unit.dy - r.y,
-        }
+        };
+        assert!(ret >= 0.0);
+        ret
     }
 
     /// Samples an event using the cell-veto algorithm.
@@ -239,22 +240,28 @@ impl<U: InvPotential + PotentialDiff + Clone> Sampler<U> {
         hint: f64,
     ) -> Option<Event> {
         let init = rs[ss.id];
-        let ub = self.cv_ub::<K>(&init);
+        let ub_cv = self.cv_ub::<K>(&init);
+        let (ub, ev_ub) = if ub_cv < hint {
+            // Stopped by extended cell boundary
+            (
+                ub_cv,
+                Some(Event::without_peer(ctx, EventKind::Grid, ub_cv).unwrap()),
+            )
+        } else {
+            // Stopped by hint
+            (hint, None)
+        };
         let base = self.inner.gs.gindex(&init);
         let mut time = 0.0;
         loop {
             let smp = match K {
-                BRANCH_X => self.cv_x.thinned(rng, base, hint),
-                BRANCH_Y => self.cv_y.thinned(rng, base, hint),
-            }?;
+                BRANCH_X => self.cv_x.thinned(rng, base),
+                BRANCH_Y => self.cv_y.thinned(rng, base),
+            };
             time += smp.time;
-            if time > hint {
-                log::debug!("cell-veto skipped");
-                break None;
-            }
             if time > ub {
-                log::debug!("grid stop");
-                break Some(Event::without_peer(ctx, EventKind::Grid, ub).unwrap());
+                log::debug!("sampling aborted");
+                break ev_ub;
             }
             let mov = init.move_by(ss.dir, time);
             let Some(&id_) = self.inner.g2i[smp.gid].first() else {
@@ -287,7 +294,7 @@ impl<U: InvPotential + PotentialDiff + Clone> Sampler<U> {
         self.inner
             .sur
             .iter()
-            .map(|&ij| self.inner.g2i[ij].len())
+            .map(|&ij| self.inner.g2i[ij].len().saturating_sub(1))
             .sum()
     }
 

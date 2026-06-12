@@ -204,7 +204,7 @@ impl<T: InvPotential> EDiffSampler for T {
 mod tests {
     use core::f64;
 
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
     use rand::{Rng, RngExt};
 
     use super::*;
@@ -298,48 +298,32 @@ mod tests {
         let ch = Chord::new(0.0, 3.0).unwrap();
 
         let pos = ch.at_r(-0.5).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
-        assert_approx_eq!(f64, smp.sample_impl(1.0, pos, f64::INFINITY).unwrap(), 3.0);
-        assert_approx_eq!(
-            f64,
-            smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(),
-            32.5
-        );
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
+        assert_ulps_eq!(smp.sample_impl(1.0, pos, f64::INFINITY).unwrap(), 3.0);
+        assert_ulps_eq!(smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(), 32.5);
 
         let pos = ch.at_r(0.5).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 1.5);
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.0);
-        assert_approx_eq!(f64, smp.sample_impl(1.0, pos, f64::INFINITY).unwrap(), 4.5);
-        assert_approx_eq!(
-            f64,
-            smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(),
-            32.0
-        );
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 1.5);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.0);
+        assert_ulps_eq!(smp.sample_impl(1.0, pos, f64::INFINITY).unwrap(), 4.5);
+        assert_ulps_eq!(smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(), 32.0);
 
         let pos = ch.at_r(1.5).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.5);
-        assert_approx_eq!(
-            f64,
-            smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(),
-            31.0
-        );
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.5);
+        assert_ulps_eq!(smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(), 31.0);
 
         let pos = ch.at_r(-2.5).unwrap();
-        assert_approx_eq!(
-            f64,
-            smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(),
-            32.0
-        );
+        assert_ulps_eq!(smp.sample_impl(10.5, pos, f64::INFINITY).unwrap(), 32.0);
 
         let pos = ch.at_r(0.0).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
 
         let pos = ch.at_r(-0.0).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
 
         let pos = ch.at_r(ch.rmax()).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.5);
     }
 
     #[test]
@@ -380,32 +364,27 @@ mod tests {
         let ch = Chord::new(1.0, f64::sqrt(3.0)).unwrap();
 
         let pos = ch.at_d(1.0).unwrap();
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(),
             f64::sqrt(3.0) - 1.0
         );
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             smp.sample_impl(0.25, pos, f64::INFINITY).unwrap(),
             2.0 * f64::sqrt(3.0) - 1.0 - f64::sqrt(7.0) / 3.0
         );
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(),
             3.0 * f64::sqrt(3.0) - 1.0
         );
 
         let pos = ch.at_d(-1.0).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
+        assert_ulps_eq!(
             smp.sample_impl(0.25, pos, f64::INFINITY).unwrap(),
             1.0 - f64::sqrt(95.0 - 64.0 * f64::sqrt(2.0)) / 7.0,
-            ulps = 6
+            max_ulps = 6
         );
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(),
             2.0 * f64::sqrt(3.0)
         );
@@ -413,26 +392,20 @@ mod tests {
         let ch = Chord::new(0.0, 2.0).unwrap();
 
         let pos = ch.at_d(1.0).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 1.0);
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 1.0);
+        assert_ulps_eq!(
             smp.sample_impl(0.25, pos, f64::INFINITY).unwrap(),
             5.0 / 3.0
         );
-        assert_approx_eq!(f64, smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.0);
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 2.0);
 
         let pos = ch.at_d(-1.0).unwrap();
-        assert_approx_eq!(f64, smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(smp.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
+        assert_ulps_eq!(
             smp.sample_impl(0.25, pos, f64::INFINITY).unwrap(),
             1.0 / 5.0
         );
-        assert_approx_eq!(
-            f64,
-            smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(),
-            1.0 / 3.0
-        );
+        assert_ulps_eq!(smp.sample_impl(0.5, pos, f64::INFINITY).unwrap(), 1.0 / 3.0);
     }
 
     #[test]
@@ -441,19 +414,17 @@ mod tests {
         let ch = Chord::new(0.5, f64::sqrt(35.0 / 4.0)).unwrap();
 
         let pos = ch.at_r(1.0).unwrap();
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             lj.sample_impl(0.0, pos, f64::INFINITY).unwrap(),
             f64::sqrt(f64::powf(2.0, 1.0 / 3.0) - 1.0 / 4.0) - f64::sqrt(3.0) / 2.0
         );
-        assert_approx_eq!(
-            f64,
+        assert_ulps_eq!(
             lj.sample_impl(0.5, pos, f64::INFINITY).unwrap(),
             f64::sqrt(f64::powf(4.0 + 2.0 * f64::sqrt(2.0), 1.0 / 3.0) - 1.0 / 4.0)
                 - f64::sqrt(3.0) / 2.0
         );
 
         let pos = ch.at_r(-1.0).unwrap();
-        assert_approx_eq!(f64, lj.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
+        assert_ulps_eq!(lj.sample_impl(0.0, pos, f64::INFINITY).unwrap(), 0.0);
     }
 }

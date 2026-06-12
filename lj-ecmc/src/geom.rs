@@ -300,7 +300,7 @@ impl OnChord {
 
 #[cfg(test)]
 mod tests {
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
 
     use super::*;
 
@@ -312,26 +312,26 @@ mod tests {
         let r0 = na::vector![3.0, 0.0];
         let r1 = na::vector![3.01, 5.99];
         let r1_ = gs.mirror(&r0, &r1);
-        assert_approx_eq!(f64, r1.x, r1_.x);
-        assert_approx_eq!(f64, r1.y, r1_.y + gs.simbox().1);
+        assert_ulps_eq!(r1.x, r1_.x);
+        assert_ulps_eq!(r1.y, r1_.y + gs.simbox().1);
     }
 
     #[test]
     fn test_basic() {
         let ch = Chord::new(1.0, f64::sqrt(3.0)).unwrap();
         let pos = ch.at_d(f64::sqrt(3.0)).unwrap();
-        assert_approx_eq!(f64, ch.rmax(), 2.0);
-        assert_approx_eq!(f64, ch.length(), 2.0 * f64::sqrt(3.0));
-        assert_approx_eq!(f64, pos.r(), 2.0);
+        assert_ulps_eq!(ch.rmax(), 2.0);
+        assert_ulps_eq!(ch.length(), 2.0 * f64::sqrt(3.0));
+        assert_ulps_eq!(pos.r(), 2.0);
     }
 
     #[test]
     fn test_normalize() -> anyhow::Result<()> {
         let ch = Chord::new(1.0, 1.0)?;
         let pos = ch.at_d(1.0)?.normalize();
-        assert_approx_eq!(f64, pos.d, -1.0);
+        assert_ulps_eq!(pos.d, -1.0);
         let pos = ch.at_d(-0.0)?.normalize();
-        assert_approx_eq!(f64, pos.d, 0.0);
+        assert_ulps_eq!(pos.d, 0.0);
         assert!(pos.d.is_sign_positive());
         Ok(())
     }
@@ -341,7 +341,7 @@ mod tests {
         let pos = Chord::new(1.0, f64::sqrt(3.0))?
             .at_d(0.1)?
             .try_from_r(f64::sqrt(2.0))?;
-        assert_approx_eq!(f64, pos.d, 1.0);
+        assert_ulps_eq!(pos.d, 1.0);
         Ok(())
     }
 
@@ -350,7 +350,7 @@ mod tests {
         let pos = Chord::new(1.0, f64::sqrt(3.0))?
             .at_d(-0.1)?
             .try_from_r(f64::sqrt(2.0))?;
-        assert_approx_eq!(f64, pos.d, -1.0);
+        assert_ulps_eq!(pos.d, -1.0);
         Ok(())
     }
 }

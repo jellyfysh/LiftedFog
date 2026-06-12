@@ -125,7 +125,7 @@ impl InvPotential for LJ {
 mod tests {
     use core::f64;
 
-    use float_cmp::assert_approx_eq;
+    use approx::assert_ulps_eq;
 
     use super::*;
 
@@ -139,18 +139,18 @@ mod tests {
     #[test]
     fn test_u() {
         let lj = LJ::new(3.1, 0.4).unwrap();
-        assert_approx_eq!(f64, lj.u(lj.sig), 0.0);
-        assert_approx_eq!(f64, lj.u(lj.argmin()), -lj.eps);
-        assert_approx_eq!(f64, lj.u(0.0), f64::INFINITY);
-        assert_approx_eq!(f64, lj.u(f64::INFINITY), 0.0);
+        assert_ulps_eq!(lj.u(lj.sig), 0.0);
+        assert_ulps_eq!(lj.u(lj.argmin()), -lj.eps);
+        assert_ulps_eq!(lj.u(0.0), f64::INFINITY);
+        assert_ulps_eq!(lj.u(f64::INFINITY), 0.0);
     }
 
     #[test]
     fn test_du() {
         let lj = LJ::new(3.1, 0.4).unwrap();
-        assert_approx_eq!(f64, lj.du(lj.argmin()), 0.0, epsilon = 1e-12);
-        assert_approx_eq!(f64, lj.du(0.0), f64::NEG_INFINITY);
-        assert_approx_eq!(f64, lj.du(f64::INFINITY), 0.0);
+        assert_ulps_eq!(lj.du(lj.argmin()), 0.0, epsilon = 1e-12);
+        assert_ulps_eq!(lj.du(0.0), f64::NEG_INFINITY);
+        assert_ulps_eq!(lj.du(f64::INFINITY), 0.0);
     }
 
     #[test]
@@ -158,7 +158,7 @@ mod tests {
         let lj = LJ::new(3.1, 0.4).unwrap();
         for rr in [0.0, 0.5, 1.0, 2.0, f64::INFINITY] {
             let r = rr * lj.argmin();
-            assert_approx_eq!(f64, lj.u(r), lj.u_p(r) + lj.u_n(r));
+            assert_ulps_eq!(lj.u(r), lj.u_p(r) + lj.u_n(r));
         }
     }
 
@@ -169,7 +169,7 @@ mod tests {
             let e = ee * lj.eps;
             match lj.iu_p(e) {
                 RootKindRight::Right(r) => {
-                    assert_approx_eq!(f64, lj.u_p(r), e);
+                    assert_ulps_eq!(lj.u_p(r), e);
                 }
                 RootKindRight::TooSmall => {
                     assert!(e < lj.min());
@@ -180,7 +180,7 @@ mod tests {
             }
             match lj.iu_n(e) {
                 RootKindLeft::Left(r) => {
-                    assert_approx_eq!(f64, lj.u_n(r), e, ulps = 10);
+                    assert_ulps_eq!(lj.u_n(r), e, max_ulps = 10);
                 }
                 RootKindLeft::TooSmall => {
                     assert!(e < 0.0);
